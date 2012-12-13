@@ -16,7 +16,7 @@
 #
 import webapp2
 
-from utils import templates
+from lib import templates
 
 class MainHandler(webapp2.RequestHandler):
   def get(self):

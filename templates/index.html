@@ -2,8 +2,17 @@
 <html>
   <head>
     <title>Bootstrap 101 Template</title>
-    <!-- Bootstrap -->
+    <!-- Bootstrap -->i
     <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet"></link>
+    <script type="text/javascript">
+      function showCategoryBox() {
+        var name=prompt("Please enter a new category name");
+
+        if (name != null) {
+          alert('Saved!');
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -32,17 +41,17 @@
     <div class="container">
       <div class="hero-unit">
         <div class="row">
-          <div class="span4">
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p><br><br>
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p>
+          <div class="span3">
+            <p><a class="btn btn-primary btn-large" href="#" onclick="showCategoryBox();">Create new Category</a></p><br><br>
+            <p><a class="btn btn-primary btn-large">Edit existing Category</a></p>
           </div>
           <div class="span4">
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p><br><br>
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p>
+            <p><a class="btn btn-primary btn-large">Vote on existing Category</a></p><br><br>
+            <p><a class="btn btn-primary btn-large">View results of existing Category</a></p>
           </div>
-          <div class="span2">
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p><br><br>
-            <p><a class="btn btn-primary btn-large">Learn more »</a></p>
+          <div class="span3">
+            <p><a class="btn btn-primary btn-large">Search Item/Category</a></p><br><br>
+            <p><a class="btn btn-primary btn-large">Export existing Category</a></p>
           </div>
       </div>
       </div>
