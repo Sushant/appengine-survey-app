@@ -16,10 +16,14 @@
 #
 import webapp2
 
+from utils import templates
+
 class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world!')
+  def get(self):
+    template = templates.get('index.html')
+    self.response.write(template.render())
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
+
