@@ -15,13 +15,22 @@
 # limitations under the License.
 #
 import webapp2
+from google.appengine.api import users
+from webapp2_extras.appengine.users import login_required
 
 from lib import templates
+from lib.decorators import user_auth
 
 class MainHandler(webapp2.RequestHandler):
+  @login_required
   def get(self):
     template = templates.get('index.html')
-    self.response.write(template.render())
+    user = users.get_current_user()
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/")
+    }
+    self.response.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
