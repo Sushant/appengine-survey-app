@@ -7,11 +7,11 @@ class Category(db.Expando):
 
 class Item(db.Expando):
   name = db.StringProperty()
-  cat_id = db.StringProperty()
+  category = db.ReferenceProperty(Category, collection_name='items')
   wins = db.IntegerProperty()
   losses = db.IntegerProperty()
 
 class Comment(db.Expando):
   text = db.TextProperty()
-  item_id = db.StringProperty()
+  item = db.ReferenceProperty(Item, collection_name='comments')
   owner = db.UserProperty()

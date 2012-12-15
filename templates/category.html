@@ -9,6 +9,12 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      .icon-remove {
+        visibility: hidden;
+      }
+      .control-group:hover > .controls > .icon-remove {
+        visibility: visible;
+      }
     </style>
     <script type="text/javascript">
       numItems = 2;
@@ -52,24 +58,26 @@
 
     <div class="container">
       <div class="hero-unit">
-        <form class="form-horizontal">
+        <form class="form-horizontal" method="post" action="/category/save">
           <div class="control-group">
             <label class="control-label" for="inputName">Category name</label>
             <div class="controls">
-              <input type="text" id="inputName" placeholder="Name">
+              <input type="text" id="inputName" name="catName" placeholder="Name">
               <button type="button" class="btn btn-info" id="addItem" onclick="addAnotherItem();">Add another item</button>
             </div>
           </div>
           <div class="control-group" id="cg-1">
             <label class="control-label" for="inputItem1">Item 1</label>
             <div class="controls">
-              <input type="text" id="inputItem1" placeholder="Item1">
+              <input type="text" name="item1" id="inputItem1" placeholder="Item1">
+              <a class="icon-remove" href="#"></a>
             </div>
           </div>
           <div class="control-group" id="cg-2">
             <label class="control-label" for="inputItem2">Item 2</label>
             <div class="controls">
-              <input type="text" id="inputItem2" placeholder="Item2">
+              <input type="text" name="item2" id="inputItem2" placeholder="Item2">
+              <a class="icon-remove" href="#"></a>
             </div>
           </div>
           <div class="control-group">
