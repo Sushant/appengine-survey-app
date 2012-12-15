@@ -15,11 +15,13 @@
 # limitations under the License.
 #
 import webapp2
+import category
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
 from lib import templates
 from lib.decorators import user_auth
+
 
 class MainHandler(webapp2.RequestHandler):
   @login_required
@@ -33,6 +35,7 @@ class MainHandler(webapp2.RequestHandler):
     self.response.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    webapp2.Route('/category/new', handler='category.CategoryHandler', handler_method='new')
 ], debug=True)
 
