@@ -211,5 +211,9 @@ class CategoryHandler(webapp2.RequestHandler):
   @login_required
   def delete(self, cat_id):
     category = Category.get_by_id(int(cat_id))
-    category.items.delete()
+    cat_name = category.name
+    for item in category.items:
+      item.delete()
+    category.delete()
+    self._show_home_page({'success': 'Successfully deleted category "%s"' % cat_name})
 
