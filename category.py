@@ -27,20 +27,38 @@ class CategoryHandler(webapp2.RequestHandler):
     user = users.get_current_user()
     if user:
       category = None
-      cat_name = self.request.POST['catName']
-      category = Category(name=cat_name, owner=user)
-      category.put()
+      cat_name = cgi.escape(self.request.POST['catName'])
+      category_exists = self._check_if_category_exists(cat_name)
+      if category_exists:
+        self._show_home_page({'error': 'Error saving category, a category by that name already exists'})
+        return
 
+      item_list = []
       for param in self.request.POST.items():
         if param[0] != 'catName':
           if category:
-            if param[1]:
-              item = Item(name=cgi.escape(param[1]), category=category,
-                  wins=0, losses=0)
-              item.put()
-      self._show_home_page({'success': 'Saved category "%s" successfully' % cat_name})
+            if param[1] != '':
+              item_list.append(cgi.escape(param[1]))
+      if len(item_list) < 2:
+        self._show_home_page({'error': 'Error saving category, please retry by creating at least 2 items for the category'})
+        return
+
+      category = Category(name=cat_name, owner=user)
+      category.put()
+      for item_name in item_list:
+        item = Item(name=item_name, category=category, wins=0, losses=0)
+        item.put()
+        self._show_home_page({'success': 'Saved category "%s" successfully' % cat_name})
     else:
       self.redirect(users.create_login_url("/"))
+
+
+  def _check_if_category_exists(self, cat_name):
+    user = users.get_current_user()
+    categories = list(db.GqlQuery('SELECT * from Category where owner=:1 AND name=:2', user, cat_name))
+    if len(categories):
+      return True
+    return False
 
 
   @login_required
@@ -166,7 +184,7 @@ class CategoryHandler(webapp2.RequestHandler):
         percentage = item.wins * 100.0 / (item.wins + item.losses)
         percentage_str = '%.2f' % percentage
       except ZeroDivisionError:
-        percentage = 0
+        percentage = -1
         percentage_str = '-'
       item_dict = {'id': item.key().id(), 'name': item.name,
           'wins': item.wins, 'losses': item.losses,

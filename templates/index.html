@@ -71,6 +71,8 @@
       </div>
       {% if message and 'success' in message %}
       <div class="alert alert-success">{{ message['success'] }}<button type="button" class="close" data-dismiss="alert">×</button></div>
+      {% elif message and 'error' in message %}
+      <div class="alert alert-error">{{ message['error'] }}<button type="button" class="close" data-dismiss="alert">×</button></div>
       {% endif %}
     </div>
 
