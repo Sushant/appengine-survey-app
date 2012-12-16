@@ -175,3 +175,41 @@ class CategoryHandler(webapp2.RequestHandler):
         'category': category.name
     }
     self.response.out.write(template.render(template_values))
+
+
+  @login_required
+  def show_export(self):
+    categories = db.GqlQuery('SELECT * from Category')
+    template = templates.get('all_category.html')
+    user = users.get_current_user()
+    category_list = []
+    for category in categories:
+      cat = {'name': category.name, 'date': str(category.date),
+          'items': category.items.count(), 'id': category.key().id(),
+          'owner': category.owner.nickname()}
+      category_list.append(cat)
+    template_values = {
+        'page'       : 'export',
+        'user'       : user.nickname(),
+        'logout_url' : users.create_logout_url("/"),
+        'categories' : category_list
+    }
+    self.response.out.write(template.render(template_values))
+
+
+  @login_required
+  def export(self, cat_id):
+    category = Category.get_by_id(int(cat_id))
+    self.response.headers['Content-Type'] = 'text/xml'
+    xml_str = '<CATEGORY><NAME>' + category.name + '</NAME>'
+    for item in category.items:
+      xml_str += '<ITEM><NAME>' + item.name + '</NAME></ITEM>'
+    xml_str += '</CATEGORY>'
+    self.response.write('<?xml version="1.0" encoding="ISO-8859-1"?>' + xml_str)
+
+
+  @login_required
+  def delete(self, cat_id):
+    category = Category.get_by_id(int(cat_id))
+    category.items.delete()
+

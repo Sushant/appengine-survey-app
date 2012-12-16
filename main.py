@@ -46,6 +46,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/category/all', handler='category.CategoryHandler', handler_method='all', methods=['GET']),
     webapp2.Route('/category/vote/submit', handler='category.CategoryHandler', handler_method='submit_vote', methods=['POST']),
     webapp2.Route('/category/vote/<cat_id>', handler='category.CategoryHandler', handler_method='vote'),
+    webapp2.Route('/category/export/<cat_id>', handler='category.CategoryHandler', handler_method='export'),
+    webapp2.Route('/category/export', handler='category.CategoryHandler', handler_method='show_export'),
     webapp2.Route('/category/results', handler='category.CategoryHandler', handler_method='results', methods=['GET']),
     webapp2.Route('/category/result/<cat_id>', handler='category.CategoryHandler', handler_method='result', methods=['GET'])
 ], debug=True)
