@@ -48,14 +48,26 @@
           </div>
           <div class="span4">
             <p><a class="btn btn-primary btn-large" href="/category/results">View results of existing Category</a></p><br><br>
-            <p><a class="btn btn-primary btn-large">Search Item/Category</a></p><br><br>
+            <p><a href="#searchModal" role="button" class="btn btn-primary btn-large" data-toggle="modal">Search Item/Category</a></p><br><br>
             <p><a class="btn btn-primary btn-large">Export existing Category</a></p><br><br>
           </div>
         </div>
+        <div id="searchModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Enter search term</h3>
+          </div>
+          <div class="modal-body">
+            <form class="form-search" method="post" action="/search">
+              <input type="text" class="input-xlarge search-query" style="margin-left:50px;" name="searchTerm">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+          </div>
+        </div>
       </div>
-        {% if message and 'success' in message %}
-        <div class="alert alert-success">{{ message['success'] }}<button type="button" class="close" data-dismiss="alert">×</button></div>
-        {% endif %}
+      {% if message and 'success' in message %}
+      <div class="alert alert-success">{{ message['success'] }}<button type="button" class="close" data-dismiss="alert">×</button></div>
+      {% endif %}
     </div>
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>

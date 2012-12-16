@@ -16,11 +16,11 @@
 #
 import webapp2
 import category
+import search
 from google.appengine.api import users
 from webapp2_extras.appengine.users import login_required
 
 from lib import templates
-from lib.decorators import user_auth
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -34,8 +34,12 @@ class MainHandler(webapp2.RequestHandler):
     }
     self.response.write(template.render(template_values))
 
+  def search(self):
+    self.response.write(self.request.POST)
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    webapp2.Route('/search', handler='search.SearchHandler', handler_method='search', methods=['POST']),
     webapp2.Route('/category/new', handler='category.CategoryHandler', handler_method='new'),
     webapp2.Route('/category/save', handler='category.CategoryHandler', handler_method='save', methods=['POST']),
     webapp2.Route('/category/mine', handler='category.CategoryHandler', handler_method='mine', methods=['GET']),
