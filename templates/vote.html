@@ -46,13 +46,15 @@
         <h2>{{ category }}</h2>
         <form class="form-horizontal" method="post" action="/category/vote/submit">
           <label class="radio">
-            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+            <input type="radio" name="optionsRadios" id="optionsRadios1" value="{{ item1['id'] }}" checked>
             {{ item1['name'] }}
           </label>
           <label class="radio">
-            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+            <input type="radio" name="optionsRadios" id="optionsRadios2" value="{{ item2['id'] }}">
             {{ item2['name'] }}
           </label><br><br>
+          <input type="hidden" name="item1" value="{{ item1['id'] }}">
+          <input type="hidden" name="item2" value="{{ item2['id'] }}">
           <button type="submit" class="btn btn-success">Vote</button>
           <a class="btn btn-danger" href="/" style="margin-left:40px;">Cancel</a>
         </form>

@@ -35,9 +35,7 @@ class CategoryHandler(webapp2.RequestHandler):
             item = Item(name=cgi.escape(param[1]), category=category,
                 wins=0, losses=0)
             item.put()
-      self.response.out.write('%s has items: ' % category.key())
-      for item in category.items:
-        self.response.out.write(item.name)
+      self._show_home_page({'success': 'Saved category "%s" successfully' % cat_name})
     else:
       self.redirect(users.create_login_url("/"))
 
@@ -94,3 +92,36 @@ class CategoryHandler(webapp2.RequestHandler):
         'item2': {'name': selected_items[1].name, 'id': selected_items[1].key().id()}
     }
     self.response.out.write(template.render(template_values))
+
+  def submit_vote(self):
+    user = users.get_current_user()
+    if user:
+      item1_id = int(self.request.POST['item1'])
+      item2_id = int(self.request.POST['item2'])
+      selected_id = int(self.request.POST['optionsRadios'])
+      item1 = Item.get_by_id(item1_id)
+      item2 = Item.get_by_id(item2_id)
+      if selected_id == item1_id:
+        item1.wins += 1
+        item1.put()
+        item2.losses += 1
+        item2.put()
+      else:
+        item2.wins += 1
+        item2.put()
+        item1.losses += 1
+        item1.put()
+
+      self._show_home_page({'success': 'Saved vote for successfully'})
+    else:
+      self.redirect(users.create_login_url("/"))
+
+  def _show_home_page(self, msg_dict):
+    template = templates.get('index.html')
+    user = users.get_current_user()
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/"),
+        'message': msg_dict
+    }
+    self.response.write(template.render(template_values))
