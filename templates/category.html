@@ -58,9 +58,12 @@
 
     <div class="container">
       <div class="hero-unit">
-        <button type="button" class="btn btn-info" id="addItem" onclick="addAnotherItem();">Import</button>
+        <form action="/category/import_new" method="post" enctype="multipart/form-data">
+          <input type="file" name="file" id="file">
+          <button type="submit" class="btn btn-warning">Import XML</button>
+        </form>
         <hr>
-        <form class="form-horizontal" method="post" action="/category/save">
+        <form class="form-horizontal" method="post" action="/category/save"> <!-- Manual creation -->
           <div class="control-group">
             <label class="control-label" for="inputName">Category name</label>
             <div class="controls">

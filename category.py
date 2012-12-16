@@ -9,6 +9,7 @@ from lib import templates
 from lib.models import Category
 from lib.models import Comment
 from lib.models import Item
+from xml.dom import minidom
 
 class CategoryHandler(webapp2.RequestHandler):
   @login_required
@@ -205,7 +206,7 @@ class CategoryHandler(webapp2.RequestHandler):
     for item in category.items:
       xml_str += '<ITEM><NAME>' + item.name + '</NAME></ITEM>'
     xml_str += '</CATEGORY>'
-    self.response.write('<?xml version="1.0" encoding="ISO-8859-1"?>' + xml_str)
+    self.response.out.write('<?xml version="1.0" encoding="ISO-8859-1"?>' + xml_str)
 
 
   @login_required
@@ -217,3 +218,23 @@ class CategoryHandler(webapp2.RequestHandler):
     category.delete()
     self._show_home_page({'success': 'Successfully deleted category "%s"' % cat_name})
 
+
+  def import_new(self):
+    user = users.get_current_user()
+    if user:
+      xml_file = self.request.POST.multi['file'].file
+      xml = ''
+      for line in xml_file.readlines():
+        xml += line.strip()
+      dom = minidom.parseString(xml)
+      cat_name = dom.getElementsByTagName('CATEGORY')[0].firstChild.childNodes[0].data
+      category = Category(name=cat_name, owner=user)
+      category.put()
+      items = dom.getElementsByTagName('ITEM')
+      for item in items:
+        item_name = item.firstChild.childNodes[0].data
+        item = Item(name=item_name, category=category, wins=0, losses=0)
+        item.put()
+      self._show_home_page({'success': 'Successfully imported category "%s"' % cat_name})
+    else:
+      self.redirect(users.create_login_url("/"))
