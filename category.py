@@ -7,6 +7,7 @@ from google.appengine.ext import db
 from webapp2_extras.appengine.users import login_required
 from lib import templates
 from lib.models import Category
+from lib.models import Comment
 from lib.models import Item
 
 class CategoryHandler(webapp2.RequestHandler):
@@ -98,6 +99,8 @@ class CategoryHandler(webapp2.RequestHandler):
     if user:
       item1_id = int(self.request.POST['item1'])
       item2_id = int(self.request.POST['item2'])
+      comment1 = self.request.POST['comment' + str(item1_id)]
+      comment2 = self.request.POST['comment' + str(item2_id)]
       selected_id = int(self.request.POST['optionsRadios'])
       item1 = Item.get_by_id(item1_id)
       item2 = Item.get_by_id(item2_id)
@@ -111,8 +114,13 @@ class CategoryHandler(webapp2.RequestHandler):
         item2.put()
         item1.losses += 1
         item1.put()
-
-      self._show_home_page({'success': 'Saved vote for successfully'})
+      if comment1:
+        comment = Comment(text=comment1, owner=user, item=item1)
+        comment.put()
+      if comment2:
+        comment = Comment(text=comment2, owner=user, item=item2)
+        comment.put()
+      self._show_home_page({'success': self.request.POST})
     else:
       self.redirect(users.create_login_url("/"))
 
@@ -125,3 +133,45 @@ class CategoryHandler(webapp2.RequestHandler):
         'message': msg_dict
     }
     self.response.write(template.render(template_values))
+
+  @login_required
+  def results(self):
+    categories = db.GqlQuery('SELECT * from Category')
+    template = templates.get('results_category.html')
+    user = users.get_current_user()
+    category_list = []
+    for category in categories:
+      cat = {'name': category.name, 'date': str(category.date),
+          'items': category.items.count(), 'id': category.key().id(),
+          'owner': category.owner.nickname()}
+      category_list.append(cat)
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/"),
+        'categories': category_list
+    }
+    self.response.out.write(template.render(template_values))
+
+  @login_required
+  def result(self, cat_id):
+    template = templates.get('results_items.html')
+    user = users.get_current_user()
+    category = Category.get_by_id(int(cat_id))
+    items = category.items
+    item_list = []
+    for item in items:
+      try:
+        percentage = (item.wins * 100.0 / (item.wins + item.losses))
+      except ZeroDivisionError:
+        percentage = 0.00
+      item_dict = {'id': item.key().id(), 'name': item.name,
+          'wins': item.wins, 'losses': item.losses,
+          'comments': item.comments, 'percentage': '%.2f' % percentage}
+      item_list.append(item_dict)
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/"),
+        'items': item_list,
+        'category': category.name
+    }
+    self.response.out.write(template.render(template_values))
