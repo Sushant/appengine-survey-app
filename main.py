@@ -51,6 +51,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/category/delete/<cat_id>', handler='category.CategoryHandler', handler_method='delete'),
     webapp2.Route('/category/results', handler='category.CategoryHandler', handler_method='results', methods=['GET']),
     webapp2.Route('/category/result/<cat_id>', handler='category.CategoryHandler', handler_method='result', methods=['GET']),
-    webapp2.Route('/category/import_new', handler='category.CategoryHandler', handler_method='import_new', methods=['POST'])
+    webapp2.Route('/category/import_page', handler='category.CategoryHandler', handler_method='import_page', methods=['GET']),
+    webapp2.Route('/category/import_xml', handler='category.CategoryHandler', handler_method='import_xml', methods=['POST'])
 ], debug=True)
 

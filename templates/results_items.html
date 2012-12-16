@@ -59,21 +59,25 @@
               <td> {{ item['name'] }} </td>
               <td> {{ item['wins'] }} </td>
               <td> {{ item['losses'] }} </td>
-              <td> {{ item['percentage'] }} </td>
+              <td> {{ item['percentage_str'] }} </td>
               <td>
-                <a href="#modal{{ item['id'] }}" role="button" class="btn btn-inverse" data-toggle="modal">View comments</a>
-                <!-- Modal -->
-                <div id="modal{{ item['id'] }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 id="myModalLabel">Comments for {{ item['name'] }}</h3>
+                {% if item['comment_count'] > 0 %}
+                  <a href="#modal{{ item['id'] }}" role="button" class="btn btn-inverse" data-toggle="modal">View comments</a>
+                  <!-- Modal -->
+                  <div id="modal{{ item['id'] }}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="myModalLabel">Comments for {{ item['name'] }}</h3>
+                    </div>
+                    <div class="modal-body">
+                      {% for comment in item.comments %}
+                      <p style="font-size:12px"><b>{{ comment.owner }} says</b>: {{ comment.text }}</p>
+                      {% endfor %}
+                    </div>
                   </div>
-                  <div class="modal-body">
-                    {% for comment in item.comments %}
-                    <p style="font-size:12px"><b>{{ comment.owner }} says</b>: {{ comment.text }}</p>
-                    {% endfor %}
-                  </div>
-                </div>
+                 {% else %}
+                  No comments posted
+                 {% endif %}
               </td>
             </tr>
             {% endfor %}

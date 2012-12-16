@@ -34,9 +34,10 @@ class CategoryHandler(webapp2.RequestHandler):
       for param in self.request.POST.items():
         if param[0] != 'catName':
           if category:
-            item = Item(name=cgi.escape(param[1]), category=category,
-                wins=0, losses=0)
-            item.put()
+            if param[1]:
+              item = Item(name=cgi.escape(param[1]), category=category,
+                  wins=0, losses=0)
+              item.put()
       self._show_home_page({'success': 'Saved category "%s" successfully' % cat_name})
     else:
       self.redirect(users.create_login_url("/"))
@@ -121,7 +122,7 @@ class CategoryHandler(webapp2.RequestHandler):
       if comment2:
         comment = Comment(text=comment2, owner=user, item=item2)
         comment.put()
-      self._show_home_page({'success': self.request.POST})
+      self._show_home_page({'success': 'Successfully saved the vote'})
     else:
       self.redirect(users.create_login_url("/"))
 
@@ -162,13 +163,18 @@ class CategoryHandler(webapp2.RequestHandler):
     item_list = []
     for item in items:
       try:
-        percentage = (item.wins * 100.0 / (item.wins + item.losses))
+        percentage = item.wins * 100.0 / (item.wins + item.losses)
+        percentage_str = '%.2f' % percentage
       except ZeroDivisionError:
-        percentage = 0.00
+        percentage = 0
+        percentage_str = '-'
       item_dict = {'id': item.key().id(), 'name': item.name,
           'wins': item.wins, 'losses': item.losses,
-          'comments': item.comments, 'percentage': '%.2f' % percentage}
+          'comments': item.comments, 'percentage': percentage,
+          'comment_count': item.comments.count(),
+          'percentage_str': percentage_str}
       item_list.append(item_dict)
+    item_list = sorted(item_list, key=lambda k: k['percentage'], reverse=True)
     template_values = {
         'user' : user.nickname(),
         'logout_url': users.create_logout_url("/"),
@@ -219,7 +225,7 @@ class CategoryHandler(webapp2.RequestHandler):
     self._show_home_page({'success': 'Successfully deleted category "%s"' % cat_name})
 
 
-  def import_new(self):
+  def import_xml(self):
     user = users.get_current_user()
     if user:
       xml_file = self.request.POST.multi['file'].file
@@ -238,3 +244,12 @@ class CategoryHandler(webapp2.RequestHandler):
       self._show_home_page({'success': 'Successfully imported category "%s"' % cat_name})
     else:
       self.redirect(users.create_login_url("/"))
+
+  def import_page(self):
+    template = templates.get('import.html')
+    user = users.get_current_user()
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/")
+    }
+    self.response.write(template.render(template_values))
