@@ -4,6 +4,7 @@ import random
 import webapp2
 from google.appengine.api import users
 from google.appengine.ext import db
+from datetime import datetime, timedelta
 from webapp2_extras.appengine.users import login_required
 from lib import templates
 from lib.models import Category
@@ -28,6 +29,8 @@ class CategoryHandler(webapp2.RequestHandler):
     if user:
       category = None
       cat_name = cgi.escape(self.request.POST['catName'])
+      expiry = int(self.request.POST['expiry'])
+      expiry = datetime.now() + timedelta(days=expiry)
       category_exists = self._check_if_category_exists(cat_name)
       if category_exists:
         self._show_home_page({'error': 'Error saving category, a category by that name already exists'})
@@ -35,15 +38,14 @@ class CategoryHandler(webapp2.RequestHandler):
 
       item_list = []
       for param in self.request.POST.items():
-        if param[0] != 'catName':
-          if category:
-            if param[1] != '':
-              item_list.append(cgi.escape(param[1]))
+        if param[0] != 'catName' and param[0] != 'expiry':
+          if param[1] != '':
+            item_list.append(cgi.escape(param[1]))
       if len(item_list) < 2:
         self._show_home_page({'error': 'Error saving category, please retry by creating at least 2 items for the category'})
         return
 
-      category = Category(name=cat_name, owner=user)
+      category = Category(name=cat_name, owner=user, expiry=expiry)
       category.put()
       for item_name in item_list:
         item = Item(name=item_name, category=category, wins=0, losses=0)
@@ -69,8 +71,13 @@ class CategoryHandler(webapp2.RequestHandler):
     user = users.get_current_user()
     category_list = []
     for category in categories:
+      if category.expiry < datetime.now():
+        expires_in = 'expired'
+      else:
+        expires_in = (category.expiry - datetime.now()).days
       cat = {'name': category.name, 'date': str(category.date),
-          'items': category.items.count(), 'id': category.key().id()}
+          'items': category.items.count(), 'id': category.key().id(),
+          'expires_in': expires_in}
       category_list.append(cat)
     template_values = {
         'user' : user.nickname(),
@@ -86,9 +93,13 @@ class CategoryHandler(webapp2.RequestHandler):
     user = users.get_current_user()
     category_list = []
     for category in categories:
+      if category.expiry < datetime.now():
+        expires_in = 'expired'
+      else:
+        expires_in = (datetime.now() - category.expiry).days
       cat = {'name': category.name, 'date': str(category.date),
           'items': category.items.count(), 'id': category.key().id(),
-          'owner': category.owner.nickname()}
+          'owner': category.owner.nickname(), 'expires_in': expires_in}
       category_list.append(cat)
     template_values = {
         'user' : user.nickname(),
@@ -315,6 +326,9 @@ class CategoryHandler(webapp2.RequestHandler):
 
   def show_edit(self, cat_id):
     category = Category.get_by_id(int(cat_id))
+    expires_in = (category.expiry - datetime.now()).days
+    if expires_in < 0:
+      expires_in = 0
     template = templates.get('edit_page.html')
     user = users.get_current_user()
     template_values = {
@@ -322,6 +336,7 @@ class CategoryHandler(webapp2.RequestHandler):
         'logout_url': users.create_logout_url("/"),
         'items': category.items,
         'category': category,
+        'expires_in': expires_in,
         'item_count': category.items.count()
     }
     self.response.write(template.render(template_values))

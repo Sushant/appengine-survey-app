@@ -63,7 +63,11 @@
               {% if page == 'export' %}
                 <td><a class="btn btn-small btn-info" href="/category/export/{{ category['id'] }}">Export</a></td>
               {% else %}
-                <td><a class="btn btn-small btn-info" href="/category/vote/{{ category['id'] }}">Select</a></td>
+                {% if 'expires_in' in category and category['expires_in'] == 'expired' %}
+                  <td>Expired</td>
+                {% else %}
+                  <td><a class="btn btn-small btn-info" href="/category/vote/{{ category['id'] }}">Select</a></td>
+                {% endif %}
               {% endif %}
             </tr>
            {% endfor %}

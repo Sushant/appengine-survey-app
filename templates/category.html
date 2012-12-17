@@ -15,8 +15,14 @@
       .control-group:hover > .controls > .icon-remove {
         visibility: visible;
       }
+      .form-horizontal .control-group {
+        margin-left: 115px;
+      }
     </style>
     <script type="text/javascript">
+      $(document).ready(function(){
+        $("#appendedInput").numeric();
+      });
       numItems = 2;
       function addAnotherItem() {
         itemId = numItems + 1;
@@ -64,6 +70,15 @@
             <div class="controls">
               <input type="text" id="inputName" name="catName" placeholder="Name">
               <button type="button" class="btn btn-info" id="addItem" onclick="addAnotherItem();">Add another item</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="inputExpiry">Expire after</label>
+            <div class="controls">
+              <div class="input-append">
+                <input class="span2" id="appendedInput" type="text" name="expiry" placeholder="365">
+                <span class="add-on">days</span>
+              </div>
             </div>
           </div>
           <div class="control-group" id="cg-1">

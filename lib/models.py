@@ -5,6 +5,7 @@ class Category(search.SearchableModel):
   name = db.StringProperty()
   owner = db.UserProperty()
   date = db.DateTimeProperty(auto_now_add=True)
+  expiry = db.DateTimeProperty()
 
   @classmethod
   def SearchableProperties(cls):
