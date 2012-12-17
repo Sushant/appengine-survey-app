@@ -42,6 +42,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/search', handler='search.SearchHandler', handler_method='search', methods=['POST']),
     webapp2.Route('/category/new', handler='category.CategoryHandler', handler_method='new'),
     webapp2.Route('/category/save', handler='category.CategoryHandler', handler_method='save', methods=['POST']),
+    webapp2.Route('/category/edit', handler='category.CategoryHandler', handler_method='edit', methods=['POST']),
     webapp2.Route('/category/mine', handler='category.CategoryHandler', handler_method='mine', methods=['GET']),
     webapp2.Route('/category/all', handler='category.CategoryHandler', handler_method='all', methods=['GET']),
     webapp2.Route('/category/show_edit/<cat_id>', handler='category.CategoryHandler', handler_method='show_edit'),

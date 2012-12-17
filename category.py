@@ -321,6 +321,26 @@ class CategoryHandler(webapp2.RequestHandler):
         'user' : user.nickname(),
         'logout_url': users.create_logout_url("/"),
         'items': category.items,
-        'category': category
+        'category': category,
+        'item_count': category.items.count()
     }
     self.response.write(template.render(template_values))
+
+  def edit(self):
+    user = users.get_current_user()
+    if user:
+      cat_name = cgi.escape(self.request.POST['catName'])
+
+      item_list = []
+      for param in self.request.POST.items():
+        if param[0] != 'catName':
+          if param[1] != '':
+            item_list.append(cgi.escape(param[1]))
+      if len(item_list) < 2:
+        self._show_home_page({'error': 'Error saving category, please retry by creating at least 2 items for the category'})
+        return
+
+      self._edit_category(cat_name, item_list)
+      self._show_home_page({'success': 'Saved category "%s" successfully' % cat_name})
+    else:
+      self.redirect(users.create_login_url("/"))
