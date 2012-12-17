@@ -121,7 +121,8 @@ class CategoryHandler(webapp2.RequestHandler):
     user = users.get_current_user()
     item_dict = {'name': item.name, 'id': item.key().id()}
     item_comment = list(item.comments.filter('owner =', user))
-    item_dict['comment'] = item_comment[0].text
+    if item_comment:
+      item_dict['comment'] = item_comment[0].text
     return item_dict
 
   def submit_vote(self):
