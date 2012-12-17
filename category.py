@@ -105,14 +105,24 @@ class CategoryHandler(webapp2.RequestHandler):
     category = Category.get_by_id(int(cat_id))
     items = category.items
     selected_items = list(random.sample(set(items), 2))
+    item1 = self.get_item_dict(selected_items[0])
+    item2 = self.get_item_dict(selected_items[1])
     template_values = {
         'user' : user.nickname(),
         'logout_url': users.create_logout_url("/"),
         'category': category.name,
-        'item1': {'name': selected_items[0].name, 'id': selected_items[0].key().id()},
-        'item2': {'name': selected_items[1].name, 'id': selected_items[1].key().id()}
+        'item1': item1,
+        'item2': item2
     }
     self.response.out.write(template.render(template_values))
+
+
+  def get_item_dict(self, item):
+    user = users.get_current_user()
+    item_dict = {'name': item.name, 'id': item.key().id()}
+    item_comment = list(item.comments.filter('owner =', user))
+    item_dict['comment'] = item_comment[0].text
+    return item_dict
 
   def submit_vote(self):
     user = users.get_current_user()

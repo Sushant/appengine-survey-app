@@ -61,8 +61,16 @@
               </td>
             </tr>
             <tr>
+              {% if 'comment' in item1 %}
+              <td><textarea rows="3" name="comment{{ item1['id'] }}" disabled style="width:350px;">Your comment: {{ item1['comment'] }}</textarea></td>
+              {% else %}
               <td><textarea rows="3" name="comment{{ item1['id'] }}" placeholder="Write a comment" style="width:350px;"></textarea></td>
+              {% endif %}
+              {% if 'comment' in item2 %}
+              <td><textarea rows="3" name="comment{{ item2['id'] }}" disabled style="width:350px;">Your comment: {{ item2['comment'] }}</textarea></td>
+              {% else %}
               <td><textarea rows="3" name="comment{{ item2['id'] }}" placeholder="Write a comment" style="width:350px;"></textarea></td>
+              {% endif %}
             </tr>
           </table>
           <input type="hidden" name="item1" value="{{ item1['id'] }}">
