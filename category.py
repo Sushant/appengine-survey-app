@@ -263,16 +263,45 @@ class CategoryHandler(webapp2.RequestHandler):
         xml += line.strip()
       dom = minidom.parseString(xml)
       cat_name = dom.getElementsByTagName('CATEGORY')[0].firstChild.childNodes[0].data
-      category = Category(name=cat_name, owner=user)
-      category.put()
       items = dom.getElementsByTagName('ITEM')
+      item_list = []
       for item in items:
         item_name = item.firstChild.childNodes[0].data
-        item = Item(name=item_name, category=category, wins=0, losses=0)
-        item.put()
+        item_list.append(item_name)
+      category_exists = self._check_if_category_exists(cat_name)
+
+      if category_exists:
+        self._edit_category(cat_name, item_list)
+      else:
+        category = Category(name=cat_name, owner=user)
+        category.put()
+        for item_name in item_list:
+          item = Item(name=item_name, category=category, wins=0, losses=0)
+          item.put()
       self._show_home_page({'success': 'Successfully imported category "%s"' % cat_name})
     else:
       self.redirect(users.create_login_url("/"))
+
+
+  def _edit_category(self, cat_name, new_item_list):
+    user = users.get_current_user()
+    categories = list(db.GqlQuery('SELECT * from Category where owner=:1 AND name=:2', user, cat_name))
+    category = categories[0]
+    old_item_list = []
+    for item in category.items:
+      old_item_list.append(item.name)
+    items_to_add = list(set(new_item_list) - set(old_item_list))
+    items_to_delete = list(set(old_item_list) - set(new_item_list))
+
+    for item_name in items_to_add:
+      item = Item(name=item_name, category=category, wins=0, losses=0)
+      item.put()
+
+    deleted_items = category.items.filter('name IN', items_to_delete)
+    for item in deleted_items:
+      item.delete()
+
+
 
   def import_page(self):
     template = templates.get('import.html')
@@ -280,5 +309,18 @@ class CategoryHandler(webapp2.RequestHandler):
     template_values = {
         'user' : user.nickname(),
         'logout_url': users.create_logout_url("/")
+    }
+    self.response.write(template.render(template_values))
+
+
+  def show_edit(self, cat_id):
+    category = Category.get_by_id(int(cat_id))
+    template = templates.get('edit_page.html')
+    user = users.get_current_user()
+    template_values = {
+        'user' : user.nickname(),
+        'logout_url': users.create_logout_url("/"),
+        'items': category.items,
+        'category': category
     }
     self.response.write(template.render(template_values))
